@@ -2,6 +2,7 @@
 *.class
 .data/
 update_build/
+build/
 .DS_Store
 log/
 *.log
