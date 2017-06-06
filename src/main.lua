@@ -63,13 +63,14 @@ local configs = {
     design_width = DESIGN_WIDTH,    -- 设计宽
     design_height = DESIGN_HEIGHT,  -- 设计高
     seconds = 60, 					-- 超时时间
-    slient_size = 5 * 1024 * 1024,  -- 静默下载数据网络下的提示大小
+    slient_size = 8 * 1024 * 1024,  -- 静默下载数据网络下的提示大小
     
     java_channel_params = {"common/Bridge", "getChannelId", {}, "()I"},   -- java 获得渠道号的参数
     java_env_params = {"common/Bridge","getMetaData", {"VerType"}, "(Ljava/lang/String;)Ljava/lang/String;"},  -- java 获得环境信息
 
     oc_channel_params = {"iOSBridge", "getNativeInfo", {key = "ChannelID"}}, -- ios 获取渠道号的参数
     oc_env_params = {"iOSBridge", "getNativeInfo", {key = "VerType"}}, -- ios 获取环境信息
+    zip64 = JIT_BIT,
 }
-cc.LuaLoadChunksFromZIP("loader.zip")
+cc.LuaLoadChunksFromZIP("loader" .. JIT_BIT .. ".zip")
 require("loader.LoadApp").new(configs):run(true)

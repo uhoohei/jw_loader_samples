@@ -37,8 +37,22 @@ BRANCH_ID = "master"  				-- 脚本代码分支ID
 
 DATA_PATH = cc.FileUtils:getInstance():getWritablePath() .. ".data/" -- 写入文件目录
 
+JIT_BIT = ""
+if jit then
+	local target = cc.Application:getInstance():getTargetPlatform()
+	if target == 0 or target == 1 or target == 2 or target == 3 then
+		JIT_BIT = "32"
+	elseif string.find(jit.arch, "64") ~= nil then
+		JIT_BIT = "64"
+	else
+		JIT_BIT = "32"
+	end
+end
 UPDATE_PATH = DATA_PATH .. ".loader/"  -- 热更新工作目录
 GAME_ENTRANCE = "app.MyApp"  -- APP入口，在热更新完成后会被require
-PRE_LOAD_ZIPS = {"framework.zip", "game.zip"}  -- 需要提前加载的LUA代码ZIP包
+PRE_LOAD_ZIPS = {  -- 进游戏所需要预加载的ZIP列表
+	"framework" .. JIT_BIT .. ".zip",
+	"game" .. JIT_BIT .. ".zip"
+}
 
 CC_DISABLE_GLOBAL = true  -- MyApp加载完成之后禁止修改全局变量
