@@ -115,8 +115,7 @@ if not sys.argv or len(sys.argv) < 2 or sys.argv[1] not in URLS.keys():
 ENV_ID = sys.argv[1]
 
 print "生成热更文件列表"
-print "注意：", " 输入的环境ID为：", ENV_ID, " 此环境ID【必须】与安卓清单文件中的【VerType】"
-print "或者ios的info.plist中的【VerType】完全相等，否则热更不会被执行"
+print "注意：", " 输入的环境ID为：", ENV_ID, " 热更新的根URL为：", URLS.get(ENV_ID)
 print
 print "版本号: ", VERSION_NAME, " 游戏ID: ", GAME_ID, " 分支ID: ", BRANCH_ID, " 脚本版本ID: ", str(SCRIPT_VERSION)
 time.sleep(2)
