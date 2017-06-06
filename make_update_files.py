@@ -5,6 +5,8 @@ import subprocess
 import shutil
 from copy import deepcopy
 
+BASE_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
+
 # 文件扩展名
 def file_extension(path):  
   return os.path.splitext(path)[1]
@@ -91,30 +93,19 @@ def calcFileFingerAndCopyHandler(filePath):
   assetsTree[key] = [os.path.getsize(filePath), md5]
   copyFile(filePath, RES_DEST_PATH + md5)
 
-# 复制文件的handler
-def copyDataHandler(filePath):
-  for x in ignoreFiles:
-    if x in filePath:
-      return
-
-  if file_extension(filePath) not in (".zip", ".lua"):
-    return
-  copyFile(filePath, TMP_PATH)
-
 
 # 从 lua 文件中找到对应的配置项
-VERSION_NAME = readLuaConfig("src/config.lua", "VERSION_HOST")  # 版本号
-GAME_ID = readLuaConfig("src/config.lua", "GAME_ID")  # 游戏ID
-BRANCH_ID = readLuaConfig("src/config.lua", "BRANCH_ID")  # 分支ID
-SCRIPT_VERSION = int(readLuaConfig("src/app/const.lua", "SCRIPT_VERSION_ID"))  # 脚本版本号
+VERSION_NAME = readLuaConfig(BASE_PATH + "src/config.lua", "VERSION_HOST")  # 版本号
+GAME_ID = readLuaConfig(BASE_PATH + "src/config.lua", "GAME_ID")  # 游戏ID
+BRANCH_ID = readLuaConfig(BASE_PATH + "src/config.lua", "BRANCH_ID")  # 分支ID
+SCRIPT_VERSION = int(readLuaConfig(BASE_PATH + "src/app/const.lua", "SCRIPT_VERSION_ID"))  # 脚本版本号
 MAIN_VERSION = VERSION_NAME.split('.')[0]  # 主版本号
 
 
+# TODO: 修改这里的链接为你的服务端的下载链接
 URLS = {
-  "w": "http://production.samples.com/updates",
-  "v": "http://verify.samples.com/updates",
-  "t": "http://test.samples.com/updates",
-  "n": "http://develop.samples.com/updates",
+  "w": "https://down.samples.com/update",
+  "t": "https://test.down.samples.com/update",
 }
 
 if not sys.argv or len(sys.argv) < 2 or sys.argv[1] not in URLS.keys():
@@ -130,15 +121,14 @@ print
 print "版本号: ", VERSION_NAME, " 游戏ID: ", GAME_ID, " 分支ID: ", BRANCH_ID, " 脚本版本ID: ", str(SCRIPT_VERSION)
 time.sleep(2)
 
-DATA_PATH = './.data/'  # DATA路径
 ignoreFiles = (".DS_Store", "Thumb.db")  # 要忽略的文件
-RES_PATH = "./res"  # 要扫描的主目录
+RES_PATH = BASE_PATH + "build/res"  # 要扫描的目录
 versionFile = "version.txt"
 indexFile = "resindex.txt"
 BASE_URL = URLS[ENV_ID]
 subPath = GAME_ID + '/v' + MAIN_VERSION + '_' + BRANCH_ID + "/"
 url = BASE_URL + '/' + subPath
-BUILD_PATH = "./update_build/" + subPath # 编译路径
+BUILD_PATH = BASE_PATH + "update_build/" + subPath # 编译路径
 RES_DEST_PATH = BUILD_PATH + "resources/"
 TMP_PATH = BUILD_PATH + "tmp/"
 
@@ -160,7 +150,6 @@ rootTree['assets'] = assetsTree
 removePath(BUILD_PATH)  # 先清空编译目录
 os.makedirs(RES_DEST_PATH)
 copyPath(RES_PATH, TMP_PATH)  # 拷贝资源目录
-listPathByHandler(DATA_PATH, copyDataHandler)  # 复制data目录里面的文件到临时编译目录
 removeFile(TMP_PATH + indexFile)  # 删除不需要的索引文件
 listPathByHandler(TMP_PATH, calcFileFingerAndCopyHandler)  # 生成所有文件的指纹树
 
