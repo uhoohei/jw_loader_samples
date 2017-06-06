@@ -2,12 +2,16 @@
 
 ## 使用步骤：
 
-1. 安装 quick-cocos2d-x 3.3
+1. 安装社区版 quick-cocos2d-x 3.6
 2. 下载关联的热更工程 https://github.com/uhoohei/jw_loader.git
-3. 运行本示例的根目录下的 loader_build.sh 来编译 loader.zip 文件，编译成功的话此文件直接进入 res 目录。
-4. 我们自己的游戏会在此时编译 quick 的frameworks，此步骤可选，不过建议是打包，不然碎文件太多，后面生成的索引文件就比较大
-5. 运行项目根目录下的 ./make_update_files.py [W] 脚本来生成客户端检测文件所需要的索引文件，运行成功后会在 res目录下放置一个 resindex.txt 的索引文件，同时会在项目根目录下的 update_build 目录下生成所有文件的MD5形式的文件
-6. 可以尝试使用了
+3. 使用quick创建你的空工程，并删除空工程下的 src res 目录
+4. 将samples中的　res src 以及根目录下的所有sh脚本和py脚本拷贝到空工程中
+5. 搜索全工程目录，替换TODO_SET_PWD 与　YOUR_SIGN　为你的资源和代码加密密码和加密签名
+6. 运行本示例的根目录下的 loader_build.sh 来编译 loader32.zip与loader64.zip 文件，编译成功的话此文件直接进入 res 目录。
+7. 运行本示例的根目录下的　framework_build.sh 来编译　quick 的 framework，成功的话可以在res目录下看到 framework32.zip 与 framework64.zip
+8. 运行项目根目录下的 ./game_build.sh [w|t] 脚本来生成客户端初始化init32.zip与init64.zip及game32.zip与game64.zip，并生成检测热更文件所需要的索引文件，同时在目录update_build 下生成所有热更所需要的MD5形式的文件
+9. 查看下面的“修改工程入口以支持加密加载”一节以支持加密的资源和代码的加载
+10. enjoy it!
 
 
 ## 热更的关键参数说明
@@ -20,7 +24,8 @@
 ### 主版本号
 文件：src/config.lua
 变量名：VERSION_HOST
-主版本号在脚本里面有定义，在安卓的清单文件中也有定义，在IOS的PLIST中也有定义，脚本里面的只是基本值，它同时也需要被 make_update_files.py 所读取，版本号的第一位数字是主版本，热更时会判断此值，***不允许跨主版本***进行热更，即不允许从1.XX热更到2.XX
+主版本号在脚本里面有定义，在安卓的清单文件中也有定义，在IOS的PLIST中也有定义，脚本里面的只是基本值，它同时也需要被 make_update_files.py 所读取，版本号的第一位数字是主版本，热更时会判断此值，***不推荐跨主版本***进行热更，一般用大版本号来表示项目引擎本身的变更，这些变更可能在
+脚本层不是兼容的
 
 ### 分支ID
 文件：src/config.lua
@@ -41,20 +46,17 @@
 游戏的真正入口，热更完成后会加载此入口文件并new出来进行真正的进入游戏的过程
 
 ### 环境ID
-此处定义了四个 
+此处定义了2个 
 * w: 正式环境
-* v: 审核环境
 * t: 测试环境
-* n: 内网开发环境
-执行 py 脚本生成索引时，一定要注意此项
+执行 game_build.sh 脚本生成索引时，一定要注意此项
 
 ## 热更的打包流程
-
-执行完通用的脚本编译流程之后，
-再执行工程根目录下的 make_update_files.py, 
+一般framework_build.sh与loader_build.sh在没有新的变更的时候不需要每次都编译。
+先执行工程根目录下的 game_build.sh [w|t]
 此脚本需要输入当前是为哪个环境所编译资源，具体可看命令行提示
 
-执行完后 make_update_files.py 后，
+执行完后成功后，
 将所生成的 update_build 目录下的指定目录的文件传给服务器管理人员，由他们更新发布
 
 ## Native 工程说明
@@ -62,7 +64,30 @@
 IOS与ANDROID都需要一些NATIVE的代码来实现获得NATIVE的环境ID，NATIVE的原生版本号等。
 这部分网上很多，每个人的实现都有些不同，这里不提供，这部分的配置请参考 main.lua 中的注释进行说明
 
-## 关于quick-cocos2d-x 3.6 的版本说明
-这套热更原来是匹配 3.3 ，目前我也在用 3.6 社区版，主要的变化在于，3.6 主推LUAJIT，而IOS的32位64位对于热更的包判断不太好处理，所以我自己用的是稍微修改过的 3.6.3，你也可以自己动手修改一下，将社区的 LUAJIT 改成 使用 LUAC ，则也可以运行。
-
+## 修改工程入口以支持加密加载
+修改工程文件 Classes/AppDelegate.cpp，我的3.6.3是从104行开始，以支持资源和代码的加密
+**请修改下列SET_YOUR_PWD为你的真实项目密码**
+当然你也可以不修改，那样你需要去掉所有脚本中的与加密相关的配置选项
+```c++
+    FileUtils::getInstance()->setResourceEncryptKeyAndSign("SET_YOUR_PWD", "YOUR_SIGN");
+#if 1
+    // use luajit bytecode package
+    stack->setXXTEAKeyAndSign("SET_YOUR_PWD", "YOUR_SIGN");
+    
+#ifdef CC_TARGET_OS_IPHONE
+    if (sizeof(long) == 4) {
+        stack->loadChunksFromZIP("res/init32.zip");
+    } else {
+        stack->loadChunksFromZIP("res/init64.zip");
+    }
+#else
+    // android, mac, win32, etc
+    stack->loadChunksFromZIP("res/init32.zip");
+#endif
+    stack->executeString("require 'main'");
+#else // #if 0
+    // use discrete files
+    engine->executeScriptFile("src/main.lua");
+#endif
+```
 
