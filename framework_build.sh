@@ -25,7 +25,7 @@ COMPILE_BIN=$QUICK_V3_ROOT/quick/bin/compile_scripts.sh
 
 ENCRYPT_COMMAND=""
 if [ $1 ]; then
-    ENCRYPT_COMMAND=" -e xxtea_zip -ek $1 -es RSA "
+    ENCRYPT_COMMAND=" -e xxtea_zip -ek $1 -es YOUR_SIGN "
 fi
 
 # 编译framework脚本文件

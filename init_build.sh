@@ -22,7 +22,7 @@ cp -f $DIR/src/*.lua $SCRIPTS_DIR/
 
 ENCRYPT_COMMAND=""
 if [ $1 ]; then
-    ENCRYPT_COMMAND=" -e xxtea_zip -ek $1 -es RSA "
+    ENCRYPT_COMMAND=" -e xxtea_zip -ek $1 -es YOUR_SIGN "
 fi
 
 $COMPILE_BIN -b 32 -i $SCRIPTS_DIR -o $DEST_DIR/$file32 $ENCRYPT_COMMAND

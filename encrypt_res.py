@@ -72,7 +72,7 @@ def copy_no_encrypt_file_handler(file_path):
 
 
 remove_path(build_path)
-cmd = "$QUICK_V3_ROOT/quick/bin/encrypt_res.sh -i %s -o %s -es RSA -ek %s" % \
+cmd = "$QUICK_V3_ROOT/quick/bin/encrypt_res.sh -i %s -o %s -es YOUR_SIGN -ek %s" % \
       (res_path, build_path, sign_key)
 subprocess.call(cmd, shell=True)
 list_path_by_handler(res_path, copy_no_encrypt_file_handler)

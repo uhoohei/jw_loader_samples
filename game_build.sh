@@ -22,7 +22,7 @@ rm -f $DEST_DIR/$file64
 
 # TODO: 在这里修改你的项目的加密密码，不得超过16位，记得也修改encrypt_res.py脚本中的资源的密码
 PASSWORD=TODO_SET_PWD
-ENCRYPT_COMMAND=" -e xxtea_zip -ek $PASSWORD -es RSA "
+ENCRYPT_COMMAND=" -e xxtea_zip -ek $PASSWORD -es YOUR_SIGN "
 
 $COMPILE_BIN -b 32 -i $SCRIPTS_DIR -o $DEST_DIR/$file32 $ENCRYPT_COMMAND
 $COMPILE_BIN -b 64 -i $SCRIPTS_DIR -o $DEST_DIR/$file64 $ENCRYPT_COMMAND
