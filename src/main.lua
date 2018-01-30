@@ -62,8 +62,7 @@ local configs = {
     preload_zips = PRE_LOAD_ZIPS,   -- 需要加载的代码zip文件列表
     design_width = DESIGN_WIDTH,    -- 设计宽
     design_height = DESIGN_HEIGHT,  -- 设计高
-    seconds = 60, 					-- 超时时间
-    slient_size = 8 * 1024 * 1024,  -- 静默下载数据网络下的提示大小
+    seconds = 600, 					-- 更新超时时间
 
     zip64 = JIT_BIT,  -- 64还是32位的信息
 }
